@@ -41,9 +41,6 @@ int z=0;
 void conf_botton(void){
 	SYSCTL->RCGCGPIO|=(0x1<<3);// primero ver  los puertos a utilizar
 	GPIOD->DEN|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//habilitammos los puertos entreda o salida o funcion espesifica PD0,PD1,PD2,PD3
-	//GPIOD->DIR|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//PF2, PF3" como salida ; 
-	//GPIOD->DEN|=(0xFF);
-	//GPIOD->DIR|=(0xFF);
 	GPIOD->PUR|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);// PFsw salida como PULL-up
 	GPIOD->IBE|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//interrupcion por por ambos flancos(ya que por default ya esta hecho )
 	GPIOD->IM|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//desemascaramos en interrupcio PD0,PD1,PD2,PD3	
@@ -55,8 +52,6 @@ void conf_leds(void){
 	SYSCTL->RCGCGPIO|=(0x1<<5);// configuracion de  los puertos de leds 
 	GPIOF->DEN|=(0x1<<2)|(0x1<<3)|(0x1<<1);//habilitammos los puertos entreda o salida o funcion espesifica PF2 y PF0 PF3 y PF4 PF1
 	GPIOF->DIR|=(0x1<<2)|(0x1<<3)|(0x1<<1);//PF2,PF1, PF3" como salida 
-	//GPIOF->DATA|=(0x1<<2);// logico 1 en PF2
-	//GPIOF->DATA&=~(0x1<<2);// logico 0 en en PF2
 }
 void GPIOD_Handler(){
 	GPIOD->ICR=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//limpiando la interrupcion de esos pines
@@ -75,53 +70,4 @@ void GPIOD_Handler(){
 	}
 	delay_ms(100);
 	
-	
-	
-	
-	/*
-	int estado = 0;
-	if (GPIOD->DATA&((0x1<<0)))// 
-		{
-				GPIOF->DATA&=~(0x1<<3);// 
-		}
-		else 
-		{
-				GPIOF->DATA|=(0x1<<3);// 
-	  }
-	if (GPIOD->DATA&((0x1<<1)))// 
-		
-		{
-				GPIOF->DATA&=~(0x1<<2);// 
-				GPIOF->DATA|=(0x1<<1);// 
-				char buffer[]=("apagado");
-				estado=0;
-		}
-		else 
-		{
-		GPIOF->DATA|=(0x1<<2);// 
-		GPIOF->DATA&=~(0x1<<1);// s
-				char buffer[]=("encendido");
-			estado=1;
-			
-		}
-		//////
-		int a=0;
-		if (GPIOD->DATA&((0x1<<2)))// 
-		{
-				
-		}
-		else 
-		{
-				a++;
-	  }
-		int b=10;
-		if (GPIOD->DATA&((0x1<<3)))// 
-		{
-				
-		}
-		else 
-		{
-				b--;
-	  }
-*/
 }
