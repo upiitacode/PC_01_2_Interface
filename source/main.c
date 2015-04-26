@@ -13,17 +13,21 @@
 #include "serial_stdio.h"
 #include "retarget_tm4c.h"  
 //Al GPIO except for PD4,PD5,PB0,PB1 are 5v tolerant 
+
 void conf_botton(void);
 void conf_leds(void);
-
+Serial_t UART0_serial={UART0_getChar,UART0_sendChar};
+Serial_t UART3_serial={UART3_getChar,UART3_sendChar};//TX->PC7: RX->PC6
 Serial_t lcd_serial ={NULL,lcd_sendChar};
 
 int motorEstado=0;
 int motorGiro=0;
 
-int z=0;
+int velocidad=0;
 	int main(){
 	SystemCoreClockUpdate();//nesesario para soncronizar (o verificar el conteo)
+        UART0_init(9600);
+        UART3_init(9600);
 	lcd_init();
 	conf_botton();
 	conf_leds();
@@ -32,7 +36,7 @@ int z=0;
 	delay_ms(100);
 		while(1){
 			serial_printf(lcd_serial,"\fMotor:%s\n%s Vel:%d",
-				(motorEstado ? "ON" : "OFF"),(motorGiro ? "CW" : "CCW"),z);
+				(motorEstado ? "ON" : "OFF"),(motorGiro ? "CW" : "CCW"),velocidad);
 			delay_ms(50);
 		}
 	
@@ -58,15 +62,33 @@ void GPIOD_Handler(){
 	if (!(GPIOD->DATA&(0x1<<0))){
 		motorEstado=!motorEstado;
 		((int *)GPIOF)[(0x1<<1)|(0x1<<3)]= motorEstado ? (0x1<<3) : (0x1<<1);
+                if(motorEstado==0){
+                    serial_printf(UART3_serial,"V0\r");
+                }
+                else{
+                    serial_printf(UART3_serial,"V%d\r",velocidad);
+                }
+                    
 	}
 	if (!(GPIOD->DATA&(0x1<<1))){
 		motorGiro=!motorGiro;
+                if(motorGiro==0){
+                    serial_printf(UART3_serial,"V%d\r",velocidad);
+                }
+                else{
+                    serial_printf(UART3_serial,"V-%d\r",velocidad);
+                }
 	}
 	if (!(GPIOD->DATA&(0x1<<2))){
-		z+=10;
+		velocidad+=10;
+                velocidad=(velocidad>100)? 100: velocidad;
+                 serial_printf(UART3_serial,"V%d\r",velocidad);
 	}
 	if (!(GPIOD->DATA&(0x1<<3))){
-		z-=10;
+		velocidad-=10;
+                 velocidad=(velocidad<0)? 0: velocidad;
+                 serial_printf(UART3_serial,"V%d\r",velocidad);
+                 
 	}
 	delay_ms(100);
 	
