@@ -11,6 +11,17 @@ void configureGPIO(){
 		GPIOA->DIR|=0xF0;//Pins as Output
 }
 
+void lcd_sendChar(char c){
+  if(c=='\f'){
+		send_command(0x01);
+	}else if(c=='\n'){
+		send_command(0xC0);
+	}else{
+		send_data(c);
+	}
+	return (c);
+}
+
 void lcd_init(){
 	SystemCoreClockUpdate();
 	SystemCoreClockUpdate();

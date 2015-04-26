@@ -9,13 +9,14 @@
 //[D0 al D3]sin conexion 
 #include "TM4C123.h"                    // Device header
 #include "ARM_delay.h"
-#include <stdio.h>
 #include "LCD_lib.h"
+#include "serial_stdio.h"
+#include "retarget_tm4c.h"  
 //Al GPIO except for PD4,PD5,PB0,PB1 are 5v tolerant 
-void inicio_driver(void);
 void conf_botton(void);
 void conf_leds(void);
 
+Serial_t lcd_serial ={NULL,lcd_sendChar};
 
 int motorEstado=0;
 int motorGiro=0;
@@ -24,27 +25,19 @@ int z=0;
 	int main(){
 	SystemCoreClockUpdate();//nesesario para soncronizar (o verificar el conteo)
 	lcd_init();
-	//inicio_driver();
 	conf_botton();
 	conf_leds();
 	delay_ms(100);	
-	printf("\f");
+	serial_printf(lcd_serial,"\f");
 	delay_ms(100);
 		while(1){
-			printf("\fMotor:%s\n%s Vel:%d",(motorEstado ? "ON" : "OFF"),(motorGiro ? "CW" : "CCW"),z);
+			serial_printf(lcd_serial,"\fMotor:%s\n%s Vel:%d",
+				(motorEstado ? "ON" : "OFF"),(motorGiro ? "CW" : "CCW"),z);
 			delay_ms(50);
 		}
 	
 }
-void inicio_driver(void){
-	int a=1;
-	for(int i =0;i<100;i++){
-		printf("\fDriver motor");
-		printf("\nLoad %d!",a);
-			delay_ms(35);
-			a++;
-	}
-}
+
 void conf_botton(void){
 	SYSCTL->RCGCGPIO|=(0x1<<3);// primero ver  los puertos a utilizar
 	GPIOD->DEN|=(0x1<<0)|(0x1<<1)|(0x1<<2)|(0x1<<3);//habilitammos los puertos entreda o salida o funcion espesifica PD0,PD1,PD2,PD3

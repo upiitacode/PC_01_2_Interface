@@ -14,6 +14,8 @@
 	#define RW_WRITE 0
 	#define RW_READ 1
 	
+	void lcd_sendChar(char c);
+
 	void configureGPIO(void);
 	void outputPin(unsigned char pin_name,unsigned char pin_val);
 	void send_command(unsigned char);
