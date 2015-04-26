@@ -19,7 +19,6 @@ void lcd_sendChar(char c){
 	}else{
 		send_data(c);
 	}
-	return (c);
 }
 
 void lcd_init(){
